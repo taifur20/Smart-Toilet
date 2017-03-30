@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Toilet Management System</title>
+	<style>
+	.button {
+		background-color: #4CAF50; /* Green */
+		border: none;
+		color: white;
+		padding: 15px 32px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 34px;
+		margin: 4px 2px;
+		cursor: pointer;
+		width: 70%;
+		margin-left:15%;
+		margin-right:15%;
+		
+	}
+	.button1 {background-color: #f44336;} /* Red */ 
+	</style>
+</head>
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io();
+		//socket.on('message', function(data){document.write(data)});		
+		socket.on('update', function(data){
+		//document.write(data.description)
+		if(data.per==="-1 Persons") data.per = "0 Persons";
+		document.getElementById("air").innerHTML = data.air;
+		document.getElementById("temp").innerHTML = data.temp;
+		document.getElementById("humid").innerHTML = data.humid;
+		document.getElementById("status").innerHTML = data.stat;
+		document.getElementById("person").innerHTML = data.per;
+		document.getElementById("water").innerHTML = data.water;
+		});
+		
+		socket.on('person', function(data){
+		//document.write(data.description)
+		if(data.per==="-1 Persons") data.per = "0 Persons";
+		document.getElementById("person").innerHTML = data.per;
+		});
+		
+		//send message to server when serial button click
+		function sendRequest(){
+			socket.emit('serialButton', 'Serial button was clicked');
+			document.getElementById("b2").innerHTML = "Cancel Request";
+			document.getElementById("b1").innerHTML = "You are in the Queue";
+		}
+		//send message to server on cancel button click
+		function cancelRequest(){
+			socket.emit('cancelButton', 'Cancel button was clicked');
+			document.getElementById("b2").innerHTML = "Canceled";
+			document.getElementById("b1").innerHTML = "Take a Serial";
+		}
+		//socket.on('broadcast', function(data){
+			//document.body.ineerHTML = '';
+			//document.write(data.description);
+			//});
+		socket.on('notice', function(data){
+			alert("You already sent a request!");
+		});
+		
+		socket.on('free', function(data){
+			alert("Toilet is available! You may use it.");
+			document.getElementById("b1").innerHTML = "Toilet is available";
+		});
+		
+		socket.on('available', function(data){
+			document.getElementById("status").innerHTML = "Available";
+			document.getElementById("person").innerHTML = "0";
+		});
+		
+		socket.on('info', function(data){
+			document.getElementById("status").innerHTML = "Available";
+			alert("It is your time! The toilet is available for you.");
+			document.getElementById("b1").innerHTML = "Toilet is available";
+		});
+	</script>
+	
+<body style="margin:20px;">
+    <table cellpadding="10px;" cellspacing="0" style="font:12px verdana, sans-serif; width:80%; margin:0 auto;">
+        <tr>
+            <td colspan="3" style="background-color:#679BB7;">
+                <h1 style="font-size:38px; margin:10px 0; text-align: center; color: #212F3D">Toilet Management System</h1>
+            </td>
+        </tr>
+        <tr style="height:450px;">
+		    
+            <td style="background-color:#bbd2df; width:20%; vertical-align:top;">
+                <ul style="list-style:none; padding:0px; margin:0px;">
+                    <li style="margin-bottom:15px;"><h2 style="font-size:16px; margin:0px;">Status</h2></li>
+                    <li style="margin-bottom:15px;"><h2 id="status" style="font-size:24px; margin:0px; text-align: center; color: red">Engaged</h2></li>
+					<li style="margin-bottom:15px;"><h2 style="font-size:16px; margin:0px;">Waiting</h2></li>
+                    <li style="margin-bottom:15px;"><h2 id="person" style="font-size:24px; margin:0px; text-align: center; color: red">-- Persons</h2></li>
+                    
+                </ul>
+            </td>
+			
+            <td style="background-color:#f0f0f0; width:60%; vertical-align:top;">
+                <h2 style="font-size:36px; margin:0px; text-align: center; margin-bottom:25px; color:#5D6D7E">Welcome</h2>
+				<button class="button" id="b1" onclick="sendRequest()">Take a Serial</button>
+				<button class="button button1" id="b2" onclick="cancelRequest()">Cancel</button>
+            </td>
+            
+            <td style="background-color:#bbd2df; width:20%; vertical-align:top;">
+                <ul style="list-style:none; padding:0px; margin:0px;">
+                    <li style="margin-bottom:15px;"><h2 style="font-size:16px; margin:0px;">Air Quality</h2></li>
+					<li style="margin-bottom:15px;"><h2 id="air" style="font-size:24px; margin:0px; text-align:center">--</h2></li>
+                    <li style="margin-bottom:15px;"><h2 style="font-size:16px; margin:0px;">Temperature</h2></li>
+					<li style="margin-bottom:15px;"><h2 id="temp" style="font-size:24px; margin:0px; text-align:center">--</h2></li>
+                    <li style="margin-bottom:15px;"><h2 style="font-size:16px; margin:0px;">Humidity</h2></li>
+					<li style="margin-bottom:15px;"><h2 id="humid" style="font-size:24px; margin:0px; text-align:center">--</h2></li>
+					<li style="margin-bottom:15px;"><h2 style="font-size:16px; margin:0px;">Water Supply</h2></li>
+					<li style="margin-bottom:15px;"><h2 id="water" style="font-size:24px; margin:0px; text-align:center">--</h2></li>
+                </ul>
+            </td>
+            
+        </tr>
+        <tr>
+            <td colspan="3" style="background-color:#679BB7;">
+                <p style="text-align:center; margin:5px;">copyright &copy; t@ifur</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html> 
